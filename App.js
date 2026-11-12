@@ -164,6 +164,20 @@ export default function App() {
       return;
     }
 
+    // Kiểm tra tính duy nhất của Mã giảng viên khi thêm mới (Tránh trùng / ghi đè)
+    if (!isEditing) {
+      const isDuplicate = giangViens.some(
+        (item) => item.IDGV.trim().toLowerCase() === idgv.trim().toLowerCase()
+      );
+      if (isDuplicate) {
+        showAlert(
+          "Trùng mã giảng viên",
+          `Mã giảng viên "${idgv.trim()}" đã tồn tại trên hệ thống! Vui lòng chọn mã khác.`
+        );
+        return;
+      }
+    }
+
     try {
       setSavingLoading(true);
 
