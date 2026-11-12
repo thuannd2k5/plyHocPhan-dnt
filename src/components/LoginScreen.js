@@ -21,7 +21,7 @@ export default function LoginScreen({ email, setEmail, password, setPassword, on
           style={styles.textInput}
           value={email}
           onChangeText={setEmail}
-          placeholder="admin@qlhocphan.edu.vn"
+          placeholder=""
           autoCapitalize="none"
         />
 
@@ -30,7 +30,7 @@ export default function LoginScreen({ email, setEmail, password, setPassword, on
           style={styles.textInput}
           value={password}
           onChangeText={setPassword}
-          placeholder="••••••••"
+          placeholder=""
           secureTextEntry
         />
 

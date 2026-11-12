@@ -38,7 +38,7 @@ export default function App() {
 
   // 1. Quản lý trạng thái xác thực Admin
   const [currentUser, setCurrentUser] = useState(null);
-  const [authEmail, setAuthEmail] = useState("admin@qlhocphan.edu.vn");
+  const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
 
@@ -57,6 +57,7 @@ export default function App() {
   const [fullname, setFullname] = useState("");
   const [sumClass, setSumClass] = useState("");
   const [imageUri, setImageUri] = useState("");
+  const [imageBase64, setImageBase64] = useState("");
   const [savingLoading, setSavingLoading] = useState(false);
 
   // Tự động tải dữ liệu khi Admin đã đăng nhập
@@ -110,7 +111,7 @@ export default function App() {
     setGiangViens([]);
   };
 
-  // Chọn ảnh từ thiết bị (Web & Mobile)
+  // Chọn ảnh từ thiết bị (Hỗ trợ Base64 cho iOS)
   const handlePickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
@@ -122,11 +123,13 @@ export default function App() {
       mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.8,
+      quality: 0.7,
+      base64: true, // Kích hoạt lấy dữ liệu Base64
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setImageUri(result.assets[0].uri);
+      setImageBase64(result.assets[0].base64 || "");
     }
   };
 
@@ -138,6 +141,7 @@ export default function App() {
     setFullname("");
     setSumClass("");
     setImageUri("");
+    setImageBase64("");
     setModalVisible(true);
   };
 
@@ -149,6 +153,7 @@ export default function App() {
     setFullname(gv.Fullname);
     setSumClass(String(gv.SumClass));
     setImageUri(gv.Image);
+    setImageBase64("");
     setModalVisible(true);
   };
 
@@ -162,9 +167,11 @@ export default function App() {
     try {
       setSavingLoading(true);
 
-      // Nếu ảnh được chọn từ thiết bị (URI local), tải lên Cloudinary
+      // Nếu có ảnh mới: Ưu tiên upload dạng Base64 để tương thích mượt mà 100% trên iPhone
       let finalImageUrl = imageUri;
-      if (
+      if (imageBase64) {
+        finalImageUrl = await uploadImageToCloudinary(imageBase64, true);
+      } else if (
         imageUri &&
         (imageUri.startsWith("file:") ||
           imageUri.startsWith("blob:") ||
